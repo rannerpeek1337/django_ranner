@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% block title %}
+{{ article.title }}
+{% endblock title %}
+
+
+{% block content %}
+<div class="card">
+    <img src="{{ article.get_image }}" class="card-img-top" alt="...">
+    <div class="card-body">
+        <h5 class="card-title">{{ article.title }}</h5>
+        <p class="card-text">{{ article.content }}</p>
+    </div>
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item">
+            Дата создания: <b>{{ article.created_at }}</b>
+        </li>
+        <li class="list-group-item">
+            Автор: <b>{{ article.author }}</b>
+        </li>
+        <li class="list-group-item">
+            Категория: <b>{{ article.category }}</b>
+        </li>
+        <li class="list-group-item">
+            Просмотры: <b>{{ article.views }}</b>
+        </li>
+    </ul>
+
+    <div class="card-footer d-flex justify-content-between align-items-center">
+        <div>
+            <a href="{% url 'add_vote' obj_type='article' obj_id=article.pk action='add_like' %}"
+               class="fs-4 text-decoration-none text-success me-3">
+                <i class="bi-hand-thumbs-up"></i>
+                {{ likes }}
+            </a>
+            <a href="{% url 'add_vote' obj_type='article' obj_id=article.pk action='add_dislike' %}"
+               class="fs-4 text-decoration-none text-danger">
+                <i class="bi-hand-thumbs-down"></i>
+                {{ dislikes }}
+            </a>
+        </div>
+        {% if request.user.is_superuser or request.user == article.author %}
+        <div class="d-flex gap-3 ms-auto">
+            <a href="{% url 'update' article.pk %}" class="btn btn-warning">Изменить</a>
+            <a href="{% url 'delete' article.pk %}" class="btn btn-danger">Удалить</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+
+<div class="mt-3">
+    <h3 class="text-center mb-3">Комментарии</h3>
+    {% if request.user.is_authenticated %}
+    <form action="" class="mb-3" method="post">
+        {% csrf_token %}
+        {{ form }}
+        <button class="btn btn-dark mt-3">Отправить</button>
+    </form>
+    {% else %}
+    <p class="text-center">
+        Только авторизованные пользователи, могут оставлять комментарий
+        <a href="{% url 'login' %}">Авторизоваться</a>
+    </p>
+    {% endif %}
+    <div class="d-flex flex-column gap-3">
+        {% for comment in comments %}
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                {{ comment.created_at }}
+                <div>
+                    <a href="{% url 'add_vote' obj_type='comment' obj_id=comment.pk action='add_like' %}"
+                       class="fs-4 text-decoration-none text-success me-3">
+                        <i class="bi-hand-thumbs-up"></i>
+                        {% for key, value in comment_likes.items %}
+                            {% if key == comment.pk and value != 0 %}
+                                {{ value }}
+                            {% elif key == comment.pk and value == 0 %}
+                                0
+                            {% endif %}
+                        {% endfor %}
+                    </a>
+                    <a href="{% url 'add_vote' obj_type='comment' obj_id=comment.pk action='add_dislike' %}"
+                       class="fs-4 text-decoration-none text-danger">
+                        <i class="bi-hand-thumbs-down"></i>
+                        {% for key, value in comment_dislikes.items %}
+                            {% if key == comment.pk and value != 0 %}
+                                {{ value }}
+                            {% elif key == comment.pk and value == 0 %}
+                                0
+                            {% endif %}
+                        {% endfor %}
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <blockquote class="blockquote mb-0">
+                    <p>{{ comment.content }}</p>
+                    <footer class="blockquote-footer"><cite title="Source Title">{{ comment.author }}</cite>
+                    </footer>
+                </blockquote>
+            </div>
+        </div>
+        {% empty %}
+        <h3 class="text-center my-4">No comments</h3>
+        {% endfor %}
+
+    </div>
+</div>
+{% endblock content %}

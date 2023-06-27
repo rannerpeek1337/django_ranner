@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Автор: {{ username }}
+{% endblock title %}
+
+{% block content %}
+<div class="mb-4">
+    <div class="row">
+        <div class="col-3">
+            <ul class="list-group">
+                <li class="list-group-item">
+                    Имя: <b>{{ user.first_name }}</b>
+                </li>
+                <li class="list-group-item">
+                    Фамилия: <b>{{ user.last_name }}</b>
+                </li>
+                <li class="list-group-item">
+                    Почта: <b>{{ user.email }}</b>
+                </li>
+                <li class="list-group-item">
+                    Username: <b>{{ user.username }}</b>
+                </li>
+            </ul>
+        </div>
+        <div class="col-9">
+            <ul class="list-group">
+                <li class="list-group-item">
+                    Кол-во статей: <b>{{ articles|length }}</b>
+                </li>
+                <li class="list-group-item">
+                    Кол-во комментариев: <b>{{ total_comments }}</b>
+                </li>
+                <li class="list-group-item">
+                    Кол-во просмотров статей: <b>{{ total_views }}</b>
+                </li>
+                <li class="list-group-item">
+                    Дата регистрации: <b>{{ user.date_joined }}</b>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+</div>
+
+<div class="row row-gap-4">
+    {% for article in articles %}
+    <div class="col-4">
+        <div class="card">
+            <img src="{{ article.get_image }}" class="card-img-top" alt="...">
+            <div class="card-body">
+                <h5 class="card-title">{{ article.title }}</h5>
+                <p class="card-text">{{ article.content }}</p>
+            </div>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">
+                    Дата создания: <b>{{ article.created_at }}</b>
+                </li>
+                <li class="list-group-item">
+                    Автор: <b>{{ article.author }}</b>
+                </li>
+                <li class="list-group-item">
+                    Категория: <b>{{ article.category }}</b>
+                </li>
+            </ul>
+            <div class="card-body">
+                <a href="{{ article.get_absolute_url }}" class="card-link">Подробнее</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock content %}
